@@ -1,0 +1,22 @@
+{
+  "name": "flashcard-generator",
+  "version": "1.0.0",
+  "description": "generates flashcards",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FionaHM/Flashcard-Generator.git"
+  },
+  "author": "fionahm",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FionaHM/Flashcard-Generator/issues"
+  },
+  "homepage": "https://github.com/FionaHM/Flashcard-Generator#readme",
+  "dependencies": {
+    "anki-apkg-export": "^3.0.0"
+  }
+}
