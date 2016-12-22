@@ -1,11 +1,13 @@
 const fs = require('fs');
 // create 5 instances initially
-var BasicFlashCard = function(front, back){
+var BasicFlashCard = function(front, back, protodata){
 	this.front = front;
 	this.back = back;
+	this.protodata = protodata; // leave blank for user entered data
 	// did not use this in the fuction paramaters so that the function can be used outside the constructor objecct
-	this.createFlashcard = function(front, back){
-		// // save to a text file
+	this.createFlashcard = function(front, back, protodata){
+		// // save to a text file 
+		// set 'protodata: false' because this is user input data
 		var basicCardData =  front + ', ' + back ;
 		fs.appendFile('basic-flashcards.txt', basicCardData  +'\n', function(err) {
 		    if(err) {

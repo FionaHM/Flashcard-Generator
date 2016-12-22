@@ -1,40 +1,47 @@
-// include relevant modules
-var basicFC = require('./BasicFlashcard.js');
-var clozeFC = require('./ClozeFlashcard.js');
-var basicData = require('./basicPrototype.js');
-var clozeData = require('./clozePrototype.js');
+// global variables
+var fcArr = ["test1", "test2", "test3"]; //dummmy data
 
 // create a promise to handle initial data population
-function prototypeDataHandler(dataObject){
+function prototypeDataHandler(dataFile, constructorFile){
    return new Promise(function(resolve, reject) {	
-	// get path, params and callback
-		if ((Object.keys(dataObject).length) || (typeof dataObject != object)){
-			resolve(dataObject)
-		} else {
-			reject(error);
+		// get path, params and callback
+		var fs = require('fs');
+		// check if the files exist before they are required, log any error
+		if ((fs.existsSync(dataFile)) && (fs.existsSync(constructorFile))){
+			var FC = require(constructorFile);
+			var dataObject = require(dataFile);
+			// ensure they have data and are of expected type
+	   	 	if ((FC) && (dataObject) && (typeof dataObject === 'object')) {
+	       		// ensure that the data object has data
+				if ((Object.keys(dataObject).length !== 0 )){
+					resolve(dataObject);
+				} else {
+					reject();
+				}
+			} else {
+				reject();
+			}
+	    }  else {	
+			reject();			
 		}
-		
 	})
 }
 
-// populate storage object (file or db) with seed/prototype data
-function populateInitData(dataObject, newConstructorFC, fcType){
-	// To do+5: 
-// use promise for reading json from separate file 
-// along with any other async functions that may be needed
-	prototypeDataHandler(dataObject).then(function(response) { 
-			var newFC = new newConstructorFC();
-			for (var i = 0; i < Object.keys(dataObject).length; i++){
-				// add prototype data to the basic data file
-				newFC.createFlashcard(dataObject[i].back, dataObject[i].front);
-			}
-			console.log(fcType);
-			
 
-		}).catch(function(error){
-			console.log("something went wrong with populating initial data for the " + fcType);
-			
-		})
+// populate storage object (file or db) with seed/prototype data
+function populateInitData(dataFile, constructorFile){
+	prototypeDataHandler(dataFile, constructorFile).then(function(response) { 
+		var FC = require(constructorFile);
+		var newFC = new FC();
+		console.log(response);
+		for (var i = 0; i < Object.keys(response).length; i++){
+			// add prototype data to the basic data file
+			newFC.createFlashcard(response[i].back, response[i].front, response[i].protodata);
+			console.log(response[i].back, response[i].front);
+		}
+	}).catch(function(){
+		console.log("something went wrong, possibly with " + dataFile);		
+	})
 }
 
 
@@ -92,7 +99,7 @@ function userInputs(){
 		{
 	    	type: "list",
 	    	message: "what data do you want to view?",
-	    	name: "viewBasicOrCloze",
+	    	name: "QAorBoth",
 	    	choices: ['Question',
 			  'Answer', 'Both'],
 			when: function(answers){
@@ -101,10 +108,21 @@ function userInputs(){
 	    		} 
 		    }	
 		},
+				{
+    	type: "list",
+    	message: "which card do you want to view?",
+    	name: "viewFC",
+    	choices: fcArr,
+		when: function(answers){
+	    		if (answers.viewBasicOrCloze === "basic"){
+	    			return answers.viewBasicOrCloze === "basic"
+	    		} 
+		    } 	
+		},
 		{
 	    	type: "list",
 	    	message: "what data do you want to view?",
-	    	name: "viewBasicOrCloze",
+	    	name: "FullorCloze",
 	    	choices: ['Text with Cloze',
 			  'Full Text', 'Cloze only'],
 			when: function(answers){
@@ -112,6 +130,17 @@ function userInputs(){
 	    			return answers.viewBasicOrCloze === "cloze"
 	    		} 
 		    }	
+		},
+		{
+	    	type: "list",
+	    	message: "which card do you want to view?",
+	    	name: "viewFC",
+	    	choices: fcArr,
+			when: function(answers){
+	    		if (answers.viewBasicOrCloze === "cloze"){
+	    			return answers.viewBasicOrCloze === "cloze"
+	    		} 	
+			}
 		},
 		{
 	    	type: "input",
@@ -186,13 +215,13 @@ function userInputs(){
 
 function handleAnswers(answers){
 	// this is where user input answers are dealt with
-	console.log(answers.predefinedOptions);
 	switch (answers.predefinedOptions) {
 			case "populate-initial-data":
 				// call this if selected by user - populate seed data
 				// either in file or database
-				populateInitData(basicData, basicFC, "basic flashcard");
-				populateInitData(clozeData, clozeFC, "cloze flashcard");
+				// might want to verify that this data is not in the file already
+				populateInitData('./basicPrototype.js', './BasicFlashcard.js');
+				populateInitData('./clozePrototype.js', './clozeFlashcard.js');
 				break;
 			case "add-flashcard":
 				console.log(answers.predefinedOptions);
@@ -201,7 +230,9 @@ function handleAnswers(answers){
 				// if cloze - take in the full text and cloze and save it to the file
 				break;
 			case "view-flashcards":
-				console.log(answers.predefinedOptions);
+				console.log(answers);
+				// need 2 D array with back and front.
+				
 				// take action based on if it is "basic or cloze"
 				// if basic, determine:
 					// if question, answer or both to be displayed

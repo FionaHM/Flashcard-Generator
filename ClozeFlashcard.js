@@ -1,15 +1,17 @@
 const fs = require('fs');
 // I decided to use front for full text and back for cloze to make it consistent with basic FC and for ease of reuse of functions
-var ClozeFlashCard = function(front, back){
+var ClozeFlashCard = function(front, back, protodata){
 	this.front = front;
 	this.back = back;
+	this.protodata = protodata; // leave blank for user entered data
 	// did not use this in the fuction paramaters so that the function can be used outside the constructor objecct
-	this.createFlashcard = function(front, back){
+	this.createFlashcard = function(front, back, protodata){
 		// when saving the flashcard mark the cloze text
 		// find the text and replace with {{c1:: cloze}}
 		// var answerClose = '{{c1:' + cloze + '}}';
 		// var textWithCloze = text.replace(cloze, answerClose);
 		// store data as entered 
+		// set 'protodata: false' because this is user input data
 		var textWithCloze = front + ', ' + back;
 		// var closeCardData = '{ text:' + text + ', cloze: ' + cloze '}';
 		fs.appendFile('cloze-flashcards.txt', textWithCloze +'\n', function(err) {
