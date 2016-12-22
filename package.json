@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/FionaHM/Flashcard-Generator#readme",
   "dependencies": {
-    "anki-apkg-export": "^3.0.0"
+    "anki-apkg-export": "^3.0.0",
+    "inquirer": "^2.0.0"
   }
 }
