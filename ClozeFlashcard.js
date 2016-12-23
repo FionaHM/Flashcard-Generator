@@ -1,11 +1,11 @@
 const fs = require('fs');
 // I decided to use front for full text and back for cloze to make it consistent with basic FC and for ease of reuse of functions
-var ClozeFlashCard = function(front, back, protodata){
+var ClozeFlashCard = function(front, back){
 	this.front = front;
 	this.back = back;
-	this.protodata = protodata; // leave blank for user entered data
+	// this.protodata = protodata; // leave blank for user entered data
 	// did not use this in the fuction paramaters so that the function can be used outside the constructor objecct
-	this.createFlashcard = function(front, back, protodata){
+	this.createFlashcard = function(front, back){
 		// when saving the flashcard mark the cloze text
 		// find the text and replace with {{c1:: cloze}}
 		// var answerClose = '{{c1:' + cloze + '}}';
@@ -20,8 +20,25 @@ var ClozeFlashCard = function(front, back, protodata){
 			} 
 		})
 	}
+	
+	this.populateArray = function(){
+		// reads the text file and puts the data into an array to be used in the main.js
+		
+		fs.readFile('basic-flashcards.txt', 'utf8', function read(err, data) {
+	    if (err) {
+	        throw err;
+	    }
+
+	    console.log(data);
+	    var newArr = data.map(ch, index);
+	    console.log(newArr);
+
+
+	});
+
+	}
 	// this prints the partial question
-	this.printQuestion = function(front, back){
+	this.printQuestion = function(){
 		// read in the file and replace the cloze with '...'
 		fs.readFile('cloze-flashcards.txt', 'utf8', function read(err, data) {
 	    if (err) {

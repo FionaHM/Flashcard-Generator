@@ -1,5 +1,33 @@
 // global variables
-var fcArr = ["test1", "test2", "test3"]; //dummmy data
+var questionsArr = ["null"]; //dummmy data
+var answersArr = [];
+// var basicFC = require('./BasicFlashcard.js');
+// var clozeFC = require('./ClozeFlashcard.js');
+
+// // create a promise to check that file exists before requiring it
+// function requireFileHandler(dataFile){
+//    return new Promise(function(resolve, reject) {
+//    		var fs = require('fs');
+// 		// check if the files exist before they are required, log any error
+// 		if (fs.existsSync(dataFile)){
+// 			resolve(dataFile);
+// 	    }  else {	
+// 			reject();			
+// 		}
+// 	})
+// }
+
+// function requireFiles(){
+// 	requireFileHandler(dataFile).then(function(response) { 
+		
+// 	}).catch(function(){
+
+			
+// 	})
+// }
+// } 
+
+
 
 // create a promise to handle initial data population
 function prototypeDataHandler(dataFile, constructorFile){
@@ -33,19 +61,70 @@ function populateInitData(dataFile, constructorFile){
 	prototypeDataHandler(dataFile, constructorFile).then(function(response) { 
 		var FC = require(constructorFile);
 		var newFC = new FC();
-		console.log(response);
+		var newArr = [];
 		for (var i = 0; i < Object.keys(response).length; i++){
 			// add prototype data to the basic data file
-			newFC.createFlashcard(response[i].back, response[i].front, response[i].protodata);
-			console.log(response[i].back, response[i].front);
+			newFC.createFlashcard(response[i].back, response[i].front);
 		}
 	}).catch(function(){
 		console.log("something went wrong, possibly with " + dataFile);		
 	})
 }
 
+// create a promise to handle initial data population
+function fcDataHandler(question, answer, constructorFile){
+   return new Promise(function(resolve, reject) {	
+		// get path, params and callback
+		var fs = require('fs');
+		// check if the file exists and a new instance can be created, log any error
+		if ((fs.existsSync(constructorFile))){
+			var fc = require(constructorFile);
+			var newFC = new fc();
+			newFC.createFlashcard(question, answer);  // response = newFC
+			// newFC.createFlashcard(question, answer);  
+			resolve();
+	    }  else {	
+			reject();			
+		}
+	})
+}
+
+// populate storage object (file or db) with new FC data
+function populateData(question, answer, constructorFile){
+	fcDataHandler(question, answer, constructorFile).then(function(response) { 
+  		console.log('FC data has been saved');
+	}).then(function(){
+		continueGame();
+	}).catch(function(){
+		console.log('something went wrong, please try again.');		
+	})
+}
+
+// function addFlashCard(constructorFile){
+	
+//   	// check if user wants to continue
+
+// }
 
 function userInputs(){
+	// must populate data array
+	// ********** here
+	// var fc = require('./BasicFlashcard.js');
+	// // var newFC = new fc();
+	// var data = populateArray();
+	// console.log(data);
+	// array = data.toString().split('\n');
+	// console.log(typeof array);
+	// questionsArr = [];
+	// for (var i = 0; i < array.length; i++){
+	//     	var newArr = array[i].split(',');
+	//     	questionsArr.push(newArr[1]);
+	//     	answersArr.push(newArr[0]);
+
+	// }
+
+	
+	// console.log(questionsArr);
 	// inquirer returns a promise this allows us to use both then and catch for return data and catch errors
 	var inquirer = require('inquirer');
 	inquirer.prompt([
@@ -108,16 +187,16 @@ function userInputs(){
 	    		} 
 		    }	
 		},
-				{
-    	type: "list",
-    	message: "which card do you want to view?",
-    	name: "viewFC",
-    	choices: fcArr,
-		when: function(answers){
-	    		if (answers.viewBasicOrCloze === "basic"){
-	    			return answers.viewBasicOrCloze === "basic"
-	    		} 
-		    } 	
+		{
+	    	type: "list",
+	    	message: "which card do you want to view?",
+	    	name: "viewFC",
+	    	choices: questionsArr,
+			when: function(answers){
+		    		if (answers.viewBasicOrCloze === "basic"){
+		    			return answers.viewBasicOrCloze === "basic"
+		    		} 
+			},
 		},
 		{
 	    	type: "list",
@@ -135,7 +214,7 @@ function userInputs(){
 	    	type: "list",
 	    	message: "which card do you want to view?",
 	    	name: "viewFC",
-	    	choices: fcArr,
+	    	choices: questionsArr,
 			when: function(answers){
 	    		if (answers.viewBasicOrCloze === "cloze"){
 	    			return answers.viewBasicOrCloze === "cloze"
@@ -145,7 +224,7 @@ function userInputs(){
 		{
 	    	type: "input",
 	    	message: "Please enter a basic question:",
-	    	name: "basicQuestion",
+	    	name: "question",
 			when: function(answers){
 	    		if (answers.addBasicOrCloze === "basic"){
 	    			return answers.addBasicOrCloze === "basic"
@@ -159,7 +238,7 @@ function userInputs(){
 		{
 	    	type: "input",
 	    	message: "Please enter an answer to the previous question",
-	    	name: "basicAnswer",
+	    	name: "answer",
 			when: function(answers){
 	    		if (answers.addBasicOrCloze === "basic"){
 	    			return answers.addBasicOrCloze === "basic"
@@ -174,7 +253,7 @@ function userInputs(){
 		{
 	    	type: "input",
 	    	message: "Please enter the full text for the Cloze Flashcard:",
-	    	name: "clozeQuestion",
+	    	name: "question",
 			when: function(answers){
 	    		if (answers.addBasicOrCloze === "cloze"){
 	    			return answers.addBasicOrCloze === "cloze"
@@ -188,7 +267,7 @@ function userInputs(){
 		{
 	    	type: "input",
 	    	message: "Please the Cloze part of the previous text:",
-	    	name: "clozeAnswer",
+	    	name: "answer",
 			when: function(answers){
 	    		if (answers.addBasicOrCloze === "cloze"){
 	    			return answers.addBasicOrCloze === "cloze"
@@ -220,17 +299,56 @@ function handleAnswers(answers){
 				// call this if selected by user - populate seed data
 				// either in file or database
 				// might want to verify that this data is not in the file already
+				// set true flag in file for predefined data
+
+				// maybe tidy this part up to be more like add flash card
 				populateInitData('./basicPrototype.js', './BasicFlashcard.js');
-				populateInitData('./clozePrototype.js', './clozeFlashcard.js');
+				populateInitData('./clozePrototype.js', './ClozeFlashcard.js');
+				// check if user wants to continue
+				continueGame();
 				break;
 			case "add-flashcard":
-				console.log(answers.predefinedOptions);
-				// take action based on if it is "basic or cloze"
-				// if basic - take in the question and answer and save it to the file
-				// if cloze - take in the full text and cloze and save it to the file
-				break;
+  				switch (answers.addBasicOrCloze) {
+  					case "basic":
+ 						populateData(answers.question, answers.answer, './BasicFlashcard.js');
+  					break;
+  					case "cloze":
+  					 	populateData(answers.question, answers.answer, './ClozeFlashcard.js');
+  					break;
+  				}
 			case "view-flashcards":
 				console.log(answers);
+				switch (answers.viewBasicOrCloze) {
+  					case "basic":
+  						if (answers.QAorBoth === "Question"){
+  							 // viewFC: 'test1'  -- select card
+  							// var fc = require('./BasicFlashcard.js');
+  							// var newFC = new fc();
+  							// // populate = newFC.populateArray.map(index, ch);
+  							// newFC.populateArray(questionsArr, answersArr);
+
+  						} else if (answers.QAorBoth === "Answers") {
+
+  						} else if (answers.QAorBoth === "Both") {
+
+  						}
+  					break;
+  					case "cloze":
+  						if (answers.QAorBoth === "Question"){
+  							//  // viewFC: 'test1'  -- select card
+
+  						} else if (answers.QAorBoth === "Answers") {
+
+  						} else if (answers.QAorBoth === "Both") {
+
+  						}
+  					break;
+  				}
+				
+		// 		{ predefinedOptions: 'view-flashcards',
+  // viewBasicOrCloze: 'basic',
+  // QAorBoth: 'Question',
+  // viewFC: 'test1' }
 				// need 2 D array with back and front.
 				
 				// take action based on if it is "basic or cloze"
@@ -243,7 +361,31 @@ function handleAnswers(answers){
 				break;
 			default:
 				console.log("default");
+				// check if user wants to continue
+				
 	}
+}
+
+
+function continueGame(){
+	var inquirer = require('inquirer');
+	inquirer.prompt([
+		{
+		    type: 'confirm',
+		    name: 'continue',
+		    message: 'Do you want to continue? (Y/n)',
+		    default: 'Yes'
+	    }
+	]).then(function (answers) {
+		// make a decision on what to do - continue or not.
+		if (answers.continue === true){
+			userInputs();
+		} else {
+			console.log("Goodbye for now!");
+		}
+	}).catch(function(e){
+		errorHandler(e);
+	})
 }
 
 

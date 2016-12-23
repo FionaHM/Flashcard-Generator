@@ -1,38 +1,13 @@
-25th December, 25th December is the date of Christmas Day?
 Santa Claus, Santa Claus delivers presents on Christmas Eve?
-Rudolph, Rudolph the reindeer has a red nose.
-Jingle Bells, Jingle Bells is a famous Christmas Carol with the word Bells in the title.
 three, There were three wise men in Bethlehem?
-Santa Claus, Santa Claus delivers presents on Christmas Eve?
 25th December, 25th December is the date of Christmas Day?
-Rudolph, Rudolph the reindeer has a red nose.
 Jingle Bells, Jingle Bells is a famous Christmas Carol with the word Bells in the title.
-three, There were three wise men in Bethlehem?
+Rudolph, Rudolph the reindeer has a red nose.
 Santa Claus, Santa Claus delivers presents on Christmas Eve?
 25th December, 25th December is the date of Christmas Day?
 Rudolph, Rudolph the reindeer has a red nose.
 Jingle Bells, Jingle Bells is a famous Christmas Carol with the word Bells in the title.
 three, There were three wise men in Bethlehem?
-Santa Claus, Santa Claus delivers presents on Christmas Eve?
-25th December, 25th December is the date of Christmas Day?
-Rudolph, Rudolph the reindeer has a red nose.
-Jingle Bells, Jingle Bells is a famous Christmas Carol with the word Bells in the title.
-three, There were three wise men in Bethlehem?
-Santa Claus, Santa Claus delivers presents on Christmas Eve?
-25th December, 25th December is the date of Christmas Day?
-Rudolph, Rudolph the reindeer has a red nose.
-Jingle Bells, Jingle Bells is a famous Christmas Carol with the word Bells in the title.
-three, There were three wise men in Bethlehem?
-Santa Claus, Santa Claus delivers presents on Christmas Eve?protodata: false
-25th December, 25th December is the date of Christmas Day?protodata: false
-Rudolph, Rudolph the reindeer has a red nose.protodata: false
-Jingle Bells, Jingle Bells is a famous Christmas Carol with the word Bells in the title.protodata: false
-three, There were three wise men in Bethlehem?protodata: false
-Santa Claus, Santa Claus delivers presents on Christmas Eve?, protodata: false
-25th December, 25th December is the date of Christmas Day?, protodata: false
-Rudolph, Rudolph the reindeer has a red nose., protodata: false
-Jingle Bells, Jingle Bells is a famous Christmas Carol with the word Bells in the title., protodata: false
-three, There were three wise men in Bethlehem?, protodata: false
 Santa Claus, Santa Claus delivers presents on Christmas Eve?
 25th December, 25th December is the date of Christmas Day?
 Rudolph, Rudolph the reindeer has a red nose.
