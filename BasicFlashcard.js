@@ -1,66 +1,86 @@
 const fs = require('fs');
 // create 5 instances initially
 var BasicFlashCard = function(front, back){
+	var filename = "basic-flashcards.txt";
 	this.front = front;
 	this.back = back;
-	// this.protodata = protodata; // leave blank for user entered data
-	// did not use this in the fuction paramaters so that the function can be used outside the constructor objecct
+	// did not use "this" in the fuction paramaters so that the function can be used outside the constructor objecct
 	this.createFlashcard = function(front, back){
+
 		// // save to a text file 
-		// set 'protodata: false' because this is user input data
 		var basicCardData =  front + ', ' + back ;
-		fs.appendFile('basic-flashcards.txt', basicCardData  +'\n', function(err) {
+		fs.appendFile(filename, basicCardData  +'\n', function(err) {
 		    if(err) {
 		        return console.log(err);
 			} 
 		})
-		// console.log(front, back)
 	}
 
-	this.populateArray = function(){
-		// reads the text file and puts the data into an array to be used in the main.js
-		var array = [];
-		fs.readFile('basic-flashcards.txt', 'utf8', function read(err, data) {
-	    if (err) {
-	        throw err;
-	    }
+	this.handleFileReads = function(action){
+		function readFileHandler(filename){
+			var fs = require("fs");
+			return new Promise(function(resolve, reject){
+				fs.readFile(filename, 'utf8', function read(err, data) {
+				    if (err) {
+				        reject(err);
+				    }
+				    resolve(data);
+				})
+			})
+		}
 
-		var newData = data;
-		return newData;
+		readFileHandler(filename).then(function(response){
+				var arr = response.toString().split('\n');
+				// empty current array (questions or answers)
+				var actionArr = [];
+				if ((action === 1) || (action === 0)){ 
+
+					for (var i = 0; i < arr.length-1; i++){
+				    	var newArr = arr[i].split(',');
+				    	actionArr.push(newArr[parseInt(action)]);  
+				    	// action = 0 for questions; 1 for answers
+					};
+					// display the action requested i.e. question or anwer
+					console.log(actionArr)
+				} else if (action === 2){
+					console.log(response)
+				}
 	
-	});
+			}).catch(function(){
+				console.log("something went wrong");
+			});
 
 	}
+
 
 	this.printQuestion = function(){
-		// prints Question
+		// prints Questions
+		this.handleFileReads(0);
 		
-		fs.readFile('basic-flashcards.txt', 'utf8', function read(err, data) {
-	    if (err) {
-	        throw err;
-	    }
-	    // var questionCloze =  
-	    // var question = data.replace(questionCloze, "...");
-	    console.log(data);
+		// fs.readFile('basic-flashcards.txt', 'utf8', function read(err, data) {
+	    // if (err) {
+	    //     throw err;
+	    // }
+	    // // var questionCloze =  
+	    // // var question = data.replace(questionCloze, "...");
+	    // console.log(data);
+	    
 
-
-
-	});
 
 	}
 
-	this.displayAnswer = function(){
-		// // save to a text file
-		fs.readFile('basic-flashcards.txt', 'utf8', function read(err, data) {
-	    if (err) {
-	        throw err;
-	    }
-	    
-	    console.log(data);
+	this.printAnswer = function(){
+		// prints  answers
+		this.handleFileReads(1);
 
 
+	}
 
-	});
+
+	this.printFile = function(){
+		// prints questions and answers
+		this.handleFileReads(2);
+
 
 	}
 
