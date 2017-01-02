@@ -1,16 +1,5 @@
 Santa Claus delivers presents on Christmas Eve?,Santa Claus
-There were three wise men in Bethlehem?,three
-25th December is the date of Christmas Day?,25th December
 Jingle Bells is a famous Christmas Carol with the word Bells in the title.,Jingle Bells
-Rudolph the reindeer has a red nose.,Rudolph
-Uptown Girl is a Billy Joel song.,BAlly
-Santa Claus delivers presents on Christmas Eve?,Santa Claus
 25th December is the date of Christmas Day?,25th December
-Rudolph the reindeer has a red nose.,Rudolph
-Jingle Bells is a famous Christmas Carol with the word Bells in the title.,Jingle Bells
 There were three wise men in Bethlehem?,three
-Santa Claus delivers presents on Christmas Eve?,Santa Claus
 Rudolph the reindeer has a red nose.,Rudolph
-25th December is the date of Christmas Day?,25th December
-Jingle Bells is a famous Christmas Carol with the word Bells in the title.,Jingle Bells
-There were three wise men in Bethlehem?,three

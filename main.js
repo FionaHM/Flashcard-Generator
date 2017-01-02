@@ -1,59 +1,78 @@
-// var globalArr = [];
 // create a promise to handle initial data population from the file stored basic and cloze objects
-function prototypeDataHandler(dataFile, constructorFile){
+function prototypeDataHandler(dataFile, constructorFile, outputfile){
    return new Promise(function(resolve, reject) {	
 		// get path, params and callback
 		var fs = require('fs');
 		// check if the files exist before they are required, log any error
-		if ((fs.existsSync(dataFile)) && (fs.existsSync(constructorFile))){
-			var FC = require(constructorFile);
-			var dataObject = require(dataFile);
-			// ensure they have data and are of expected type
-	   	 	if ((FC) && (dataObject) && (typeof dataObject === 'object')) {
-	       		// ensure that the data object has data
-				if ((Object.keys(dataObject).length !== 0 )){
-					resolve(dataObject);
+		// verify that the data has not already been populated
+		console.log(populateSeedData);
+		if (populateSeedData < 2 ){
+			if ((fs.existsSync(dataFile)) && (fs.existsSync(constructorFile))){
+				var FC = require(constructorFile);
+				var dataObject = require(dataFile);
+				// delete old file if it exists
+				// console.log(outputfile);
+				var newFC = new FC(outputfile, "", "");
+				// deletes old output files
+				// console.log(newFC.filename);
+				if (fs.existsSync(newFC.filename)){
+					fs.unlinkSync(newFC.filename);
+				}
+				// ensure the files have data and are of expected type
+		   	 	if ((FC) && (dataObject) && (typeof dataObject === 'object')) {
+		       		// ensure that the data object has data
+					if ((Object.keys(dataObject).length !== 0 )){
+						populateSeedData++;
+						resolve(dataObject);
+					} else {
+						reject();
+					}
 				} else {
 					reject();
 				}
-			} else {
-				reject();
+		    }  else {	
+				reject();			
 			}
-	    }  else {	
-			reject();			
+		} else {
+			reject();	
 		}
+
 	})
 }
 
 // populate storage object (file) with seed data from files
-function populateInitData(dataFile, constructorFile){
+function populateInitData(dataFile, constructorFile, outputfile){
 	// response is the dataObject returned from the promise 
-	prototypeDataHandler(dataFile, constructorFile).then(function(response) { 
+	prototypeDataHandler(dataFile, constructorFile, outputfile).then(function(response) { 
 		// check if dataFile exists and has data - if it does then delete it and repopulate it
 		var FC = require(constructorFile);
-		var newFC = new FC();
+		var newFC = new FC(outputfile);
 		var newArr = [];
 		/// look at map function for this bit??
 		for (var i = 0; i < Object.keys(response).length; i++){
 			// add prototype data to the basic data file
-			newFC.createFlashcard(response[i].front, response[i].back);
+			newFC.createFlashcard(response[i].front, response[i].back, outputfile);
 		}
 	}).catch(function(){
-		console.log("something went wrong, possibly with " + dataFile);		
+		if (populateSeedData === 2) {
+			console.log("Initial seed data has already been populated.");		
+		} else {
+			console.log("something went wrong, possibly with " + dataFile);		
+		}
+		
 	})
 }
 
 // create a promise to handle initial data population
-function fcDataHandler(question, answer, constructorFile){
+function fcDataHandler(question, answer, constructorFile, outputfile){
    return new Promise(function(resolve, reject) {	
 		// get path, params and callback
 		var fs = require('fs');
 		// check if the file exists and a new instance can be created, log any error
 		if ((fs.existsSync(constructorFile))){
-			var fc = require(constructorFile);
-			var newFC = new fc();
-			newFC.createFlashcard(question, answer);  // response = newFC
-			// newFC.createFlashcard(question, answer);  
+			var FC = require(constructorFile);
+			var newFC = new FC(outputfile);
+			newFC.createFlashcard(question, answer, outputfile);  
 			resolve();
 	    }  else {	
 			reject();			
@@ -62,8 +81,8 @@ function fcDataHandler(question, answer, constructorFile){
 }
 
 // populate storage object (file) with new FC data
-function populateData(question, answer, constructorFile){
-	fcDataHandler(question, answer, constructorFile).then(function(response) { 
+function populateData(question, answer, constructorFile, outputfile){
+	fcDataHandler(question, answer, constructorFile, outputfile).then(function(response) { 
   		console.log('Flashcard data has been saved.');
 	}).then(function(){
 		continueGame();
@@ -73,29 +92,28 @@ function populateData(question, answer, constructorFile){
 }
 
 
-function fcDataArrayHandler(viewBasicOrCloze, constructorFile){
+function fcDataArrayHandler(viewBasicOrCloze, constructorFile, outputfile){
    return new Promise(function(resolve, reject) {	
 		// get path, params and callback
 		var fs = require('fs');
 		// check if the file exists and a new instance can be created, log any error
 		if ((fs.existsSync(constructorFile))){
-			var fc = require(constructorFile);
-			var newFC = new fc();
-			console.log(newFC);
+			var FC = require(constructorFile);
+			var newFC = new FC(outputfile);
 			resolve(newFC);	
 	    }  else {	
 			reject();			
 		}
 	}).catch(function(){
-		console.log('something went wrong, please try again.');		
+		console.log('something went wrong with creating constructor from ' + constructorFile + ', please try again.');		
 	})
 }
 
 // this is used to display individual questions and their answers 
 // Creates two separate arrays - questArr with questions and ansArr with answers
-function displayData(viewBasicOrCloze, constructorFile){
-	fcDataArrayHandler(viewBasicOrCloze, constructorFile).then(function(newFC) { 
-			newFC.getFCData().then(function(response){
+function displayData(viewBasicOrCloze, constructorFile, outputfile){
+	fcDataArrayHandler(viewBasicOrCloze, constructorFile, outputfile).then(function(newFC) { 
+			newFC.getFCData(outputfile).then(function(response){
 					console.log("in here");
 				return response;
 			}).then(function(response){
@@ -149,6 +167,94 @@ function displayData(viewBasicOrCloze, constructorFile){
 	})
 }
 
+function serveQuizData(viewBasicOrCloze, constructorFile, outputfile){
+	fcDataArrayHandler(viewBasicOrCloze, constructorFile, outputfile).then(function(newFC) { 
+			newFC.getFCData(outputfile).then(function(response){
+				return response;
+			}).then(function(response){
+				var questArr = [];
+				var ansArr = [];
+				for (var i = 0; i < response.length-1; i++){
+				    var tmpArr = response[i].split(',');
+				    if (viewBasicOrCloze === "basic"){
+						questArr.push(tmpArr[0]);
+						ansArr.push(tmpArr[1])
+					} else if (viewBasicOrCloze === "cloze"){
+						// call cloze function to hide the answer
+						var res = newFC.hideClozeData(tmpArr[0], tmpArr[1]);
+						questArr.push(res);
+						ansArr.push(tmpArr[1])
+					}
+
+				};	
+				return [questArr, ansArr];
+			}).then(function([questArr, ansArr]){
+				var inquirer = require('inquirer');
+				var i = 0;
+				inquirer.prompt([
+					{		
+					    type: 'input',
+					    name: 'answer',
+					    message: questArr[i] + ' ANSWER: ',
+					  	validate: function(str){
+							return str !== ''; //cannot be empty
+						}
+				    }
+				]).then(function (answers) {
+					// check the user input answer against the actual answer
+					if (answers.answer.toLowerCase().trim() === ansArr[i].toLowerCase().trim()){
+						console.log('You are correct the answer is: ' + ansArr[i] );
+					} else {
+						console.log('Incorrect the answer is: ' + ansArr[i] );
+					}
+					// next question
+					i++;
+					serveQuestions(questArr, ansArr, i);
+				}).catch(function(){
+					console.log("Error getting Question or Answer or Both - try again");
+
+				})
+	
+			}).catch(function(err){
+				console.log(err);
+				continueGame();
+			});
+	}).catch(function(){
+		console.log('something went wrong, please try again.');	
+		continueGame();
+	})
+}
+
+function serveQuestions(questArr, ansArr, i){
+	if (i < questArr.length){
+		var inquirer = require('inquirer');
+		inquirer.prompt([
+			{		
+			    type: 'input',
+			    name: 'answer',
+			    message: questArr[i] + ' ANSWER: ',
+			  	validate: function(str){
+					return str !== ''; //cannot be empty
+				}
+		    }
+		]).then(function (answers) {
+			// check the user input answer against the actual answer
+			if (answers.answer.toLowerCase().trim() === ansArr[i].toLowerCase().trim()){
+				console.log('You are correct the answer is: ' + ansArr[i] );
+			} else {
+				console.log('Incorrect the answer is: ' + ansArr[i] );
+			}
+			// next question
+			i++;
+			serveQuestions(questArr, ansArr, i);
+		}).catch(function(){
+			console.log("Error getting Question or Answer or Both - try again");
+
+		})
+	} else {
+		continueGame();
+	}
+}
 
 function userInputs(){
 	// inquirer returns a promise this allows us to use both then and catch for return data and catch errors
@@ -160,6 +266,18 @@ function userInputs(){
 		    message: 'Please select an option:',
 		    choices: ['admin',
 			  'user']
+	    },
+	    {
+		    type: 'list',
+		    name: 'whichGame',
+		    message: 'Please select an option:',
+		    choices: ['basic',
+			  'cloze'], 
+			when: function(answers){
+	    		if (answers.userOrAdmin === "user"){
+	    			return answers.userOrAdmin === "user"
+	    		} 
+		    }
 	    },
 		{
 		    type: 'list',
@@ -282,8 +400,24 @@ function handleAnswers(answers){
 	// this is where user input answers are dealt with
 	switch (answers.userOrAdmin) {
 			case "user":
-			// do something
-				console.log("start playing the game")
+				switch (answers.whichGame) {
+					case "basic":
+						// gives users one question at a time
+						// waits for answer
+						// displays correct answer
+						// no score keeping
+			  			serveQuizData(answers.whichGame, './BasicFlashcard.js', './basic-flashcards.txt');
+
+					break;
+					case "cloze":
+						// gives users one question at a time
+						// waits for answer
+						// displays correct answer
+						// no score keeping			
+						serveQuizData(answers.whichGame, './ClozeFlashcard.js', './cloze-flashcards.txt');
+						break;
+				}
+
 			break;
 			case "admin":
 				// this section deals with the admin operations
@@ -294,28 +428,28 @@ function handleAnswers(answers){
 							// either in file or database
 							// might want to verify that this data is not in the file already
 							// set true flag in file for predefined data
-							populateInitData('./basicPrototype.js', './BasicFlashcard.js');
-							populateInitData('./clozePrototype.js', './ClozeFlashcard.js');
+							populateInitData('./basicPrototype.js', './BasicFlashcard.js', './basic-flashcards.txt');
+							populateInitData('./clozePrototype.js', './ClozeFlashcard.js', './cloze-flashcards.txt');
 							// check if user wants to continue
 							continueGame();
 							break;
 						case "add-flashcard":
 			  				switch (answers.addBasicOrCloze) {
 			  					case "basic":
-			 						populateData(answers.question, answers.answer, './BasicFlashcard.js');
+			 						populateData(answers.question, answers.answer, './BasicFlashcard.js', './basic-flashcards.txt');
 			  					break;
 			  					case "cloze":
-			  					 	populateData(answers.question, answers.answer, './ClozeFlashcard.js');
+			  					 	populateData(answers.question, answers.answer, './ClozeFlashcard.js', './cloze-flashcards.txt');
 			  					break;
 			  				}
 			  				break;
 						case "view-flashcards":
 							switch (answers.viewBasicOrCloze) {
 			  					case "basic":
-			  						displayData(answers.viewBasicOrCloze, './BasicFlashcard.js');
+			  						displayData(answers.viewBasicOrCloze, './BasicFlashcard.js', './basic-flashcards.txt');
 			  					break;
 			  					case "cloze":
-			  						displayData(answers.viewBasicOrCloze, './ClozeFlashcard.js');
+			  						displayData(answers.viewBasicOrCloze, './ClozeFlashcard.js', './cloze-flashcards.txt');
 			  					break;
 			  				}
 							break;	
@@ -323,6 +457,7 @@ function handleAnswers(answers){
 							console.log("default");
 				}
 			break;
+			
 			default:
 				console.log("default");
 	}
@@ -352,4 +487,8 @@ function continueGame(){
 }
 
 // starts here
+
+
+var populateSeedData = 0;
+// remove .txt files from previous runs
 userInputs();
