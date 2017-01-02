@@ -1,5 +1,5 @@
-
-// create a promise to handle initial data population
+// var globalArr = [];
+// create a promise to handle initial data population from the file stored basic and cloze objects
 function prototypeDataHandler(dataFile, constructorFile){
    return new Promise(function(resolve, reject) {	
 		// get path, params and callback
@@ -25,7 +25,7 @@ function prototypeDataHandler(dataFile, constructorFile){
 	})
 }
 
-// populate storage object (file) with seed/prototype data
+// populate storage object (file) with seed data from files
 function populateInitData(dataFile, constructorFile){
 	// response is the dataObject returned from the promise 
 	prototypeDataHandler(dataFile, constructorFile).then(function(response) { 
@@ -64,16 +64,16 @@ function fcDataHandler(question, answer, constructorFile){
 // populate storage object (file) with new FC data
 function populateData(question, answer, constructorFile){
 	fcDataHandler(question, answer, constructorFile).then(function(response) { 
-  		console.log('FC data has been saved');
+  		console.log('Flashcard data has been saved.');
 	}).then(function(){
 		continueGame();
 	}).catch(function(){
-		console.log('something went wrong, please try again.');	
+		console.log('Something went wrong with saving flashcard data, please try again.');	
 	})
 }
 
 
-function fcDataArrayHandler(QAorBoth, constructorFile){
+function fcDataArrayHandler(viewBasicOrCloze, constructorFile){
    return new Promise(function(resolve, reject) {	
 		// get path, params and callback
 		var fs = require('fs');
@@ -81,14 +81,8 @@ function fcDataArrayHandler(QAorBoth, constructorFile){
 		if ((fs.existsSync(constructorFile))){
 			var fc = require(constructorFile);
 			var newFC = new fc();
-			if (QAorBoth === "Question"){
-				resolve(newFC.printQuestion());
-			} else if (QAorBoth === "Answer") {
-				resolve(newFC.printAnswer());
-			} else if (QAorBoth === "Both"){
-				resolve(newFC.printFile());
-			}
-		
+			console.log(newFC);
+			resolve(newFC);	
 	    }  else {	
 			reject();			
 		}
@@ -97,14 +91,62 @@ function fcDataArrayHandler(QAorBoth, constructorFile){
 	})
 }
 
-function displayData(QAorBoth, constructorFile){
-		fcDataArrayHandler(QAorBoth, constructorFile).then(function(response) { 
-	  		// console.log(response);
-		}).then(function(){
-			continueGame();
-		}).catch(function(){
-			console.log('something went wrong, please try again.');	
-		})
+// this is used to display individual questions and their answers 
+// Creates two separate arrays - questArr with questions and ansArr with answers
+function displayData(viewBasicOrCloze, constructorFile){
+	fcDataArrayHandler(viewBasicOrCloze, constructorFile).then(function(newFC) { 
+			newFC.getFCData().then(function(response){
+					console.log("in here");
+				return response;
+			}).then(function(response){
+				var questArr = [];
+				var ansArr = [];
+				
+				for (var i = 0; i < response.length-1; i++){
+				    var tmpArr = response[i].split(',');
+				    if (viewBasicOrCloze === "basic"){
+						questArr.push(tmpArr[0]);
+						ansArr.push(tmpArr[1])
+					} else if (viewBasicOrCloze === "cloze"){
+						// call cloze function to hide the answer
+						var res = newFC.hideClozeData(tmpArr[0], tmpArr[1]);
+						// console.log(res);
+						questArr.push(res);
+						ansArr.push(tmpArr[1])
+						// console.log(ansArr[num]);
+						// continueGame();	
+					}
+
+				};	
+				return [questArr, ansArr];
+			}).then(function([questArr, ansArr]){
+				var inquirer = require('inquirer');
+				inquirer.prompt([
+					{
+					    type: 'list',
+					    name: 'itemFC',
+					    message: 'Which flashcard do you want to view the answer for?',
+					    choices: questArr
+				    }
+
+				]).then(function (answers) {
+					// make a decision on what to do - continue or not.
+					var num = questArr.indexOf(answers.itemFC);
+					console.log('Answer: '+ ansArr[num]);
+					continueGame();
+				}).catch(function(){
+					console.log("Error getting Question or Answer or Both - try again");
+					continueGame();
+				})
+	
+			}).catch(function(err){
+				console.log(err);
+				continueGame();
+			});
+	}).catch(function(){
+		console.log('something went wrong, please try again.');	
+		continueGame();
+	})
 }
 
 
@@ -142,11 +184,7 @@ function userInputs(){
 	    		if (answers.predefinedOptions === "add-flashcard"){
 	    			return answers.predefinedOptions === "add-flashcard"
 	    		} 
-	    		// if (answers.userOrAdmin === "admin"){
-	    		// 	return answers.userOrAdmin === "admin"
-	    		// } 
-		    }
-	    		
+		    }		
 		},
 		{
 	    	type: "list",
@@ -156,15 +194,9 @@ function userInputs(){
 			  'cloze'],
 			when: function(answers){
 	    		if (answers.predefinedOptions === "view-flashcards"){
-	    // 			// populate data in choices array
-					// populateChoicesArray('./basicPrototype.js', './BasicFlashcard.js');
-					// populateChoicesArray('./clozePrototype.js', './ClozeFlashcard.js');
-	    			return answers.predefinedOptions === "view-flashcards"
+	     			return answers.predefinedOptions === "view-flashcards"
 	    		} 
-	    		// if (answers.userOrAdmin === "admin"){
-	    		// 	return answers.userOrAdmin === "admin"
-	    		// } 
-		    }
+	    	}
 	    		
 		},
 		{
@@ -177,67 +209,9 @@ function userInputs(){
 	    		if (answers.viewBasicOrCloze === "view-flashcards"){
 	    			return answers.viewBasicOrCloze ===  "view-flashcards"
 	    		} 
-	    		// if (answers.userOrAdmin === "admin"){
-	    		// 	return answers.userOrAdmin === "admin"
-	    		// } 
 		    }
 	    		
 		},
-		{
-	    	type: "list",
-	    	message: "what data do you want to view?",
-	    	name: "QAorBoth",
-	    	choices: ['Question',
-			  'Answer', 'Both'],
-			when: function(answers){
-	    		if (answers.viewBasicOrCloze === "basic"){
-	    			
-	    			return answers.viewBasicOrCloze === "basic"
-	    		} 
-	    		// if (answers.userOrAdmin === "admin"){
-	    		// 	return answers.userOrAdmin === "admin"
-	    		// } 
-		    }	
-		},
-		// {
-	 //    	type: "list",
-	 //    	message: "which card do you want to view?",
-	 //    	name: "viewFC",
-	 //    	choices: newQuestionsArr,
-	 //    		 // can be a function that returns an array
-		// 	when: function(answers){
-		//     		if (answers.viewBasicOrCloze === "basic"){
-		//     			// populateChoicesArray('./clozePrototype.js', './ClozeFlashcard.js');
-		//     			return answers.viewBasicOrCloze === "basic"
-		//     		} 
-		// 	},
-		// },
-		{
-	    	type: "list",
-	    	message: "what data do you want to view?",
-	    	name: "QAorBoth",
-	    	choices: ['Question',
-			  'Answer', 'Both'],
-			when: function(answers){
-	    		if (answers.viewBasicOrCloze === "cloze"){
-	    			return answers.viewBasicOrCloze === "cloze"
-	    		} 
-	    		// if (answers.userOrAdmin === "admin"){
-	    		// 	return answers.userOrAdmin === "admin"
-	    		// } 
-		    }	
-		},
-		// {
-	 //    	type: "list",
-	 //    	message: "which card do you want to view?",
-	 //    	name: "viewFC",
-	 //    	choices: newQuestionsArr, // can be a function that returns an array
-		// 	when: function(answers){
-	 //    		if (answers.viewBasicOrCloze === "cloze"){
-	 //    			return answers.viewBasicOrCloze === "cloze"
-	 //    		} 	
-		// 	}
-		// },
 		{
 	    	type: "input",
 	    	message: "Please enter a basic question:",
@@ -246,9 +220,6 @@ function userInputs(){
 	    		if (answers.addBasicOrCloze === "basic"){
 	    			return answers.addBasicOrCloze === "basic"
 	    		} 	
-	    		// if (answers.userOrAdmin === "admin"){
-	    		// 	return answers.userOrAdmin === "admin"
-	    		// } 
 		    },
 		    validate: function(str){
 				return str !== ''; //cannot be empty
@@ -263,9 +234,6 @@ function userInputs(){
 	    		if (answers.addBasicOrCloze === "basic"){
 	    			return answers.addBasicOrCloze === "basic"
 	    		} 
-	    		// if (answers.userOrAdmin === "admin"){
-	    		// 	return answers.userOrAdmin === "admin"
-	    		// } 	
 		    },
 		    validate: function(str){
 				return str !== ''; //cannot be empty
@@ -281,9 +249,6 @@ function userInputs(){
 	    		if (answers.addBasicOrCloze === "cloze"){
 	    			return answers.addBasicOrCloze === "cloze"
 	    		} 
-	    		// if (answers.userOrAdmin === "admin"){
-	    		// 	return answers.userOrAdmin === "admin"
-	    		// } 	
 		    },
 		    validate: function(str){
 				return str !== ''; //cannot be empty
@@ -298,9 +263,6 @@ function userInputs(){
 	    		if (answers.addBasicOrCloze === "cloze"){
 	    			return answers.addBasicOrCloze === "cloze"
 	    		}
-	    		// if (answers.userOrAdmin === "admin"){
-	    		// 	return answers.userOrAdmin === "admin"
-	    		// }  	
 		    },
 		    validate: function(str){
 				return str !== ''; //cannot be empty
@@ -311,13 +273,8 @@ function userInputs(){
 	]).then(function (answers) {
 		// return action, values;
 		handleAnswers(answers);
-		// var optionSelected  =  answers.predefinedOptions;
-		// var userInput = answers.userInput;
-		// // var continueGame = answers.confirmNewGame;
-		// // calls function to decide what to do with user input
-		// handleUserData(optionSelected, userInput);	
 	}).catch(function(e){
-		//errorHandler(e);
+		console.log(e);
 	})
 };
 
@@ -337,8 +294,6 @@ function handleAnswers(answers){
 							// either in file or database
 							// might want to verify that this data is not in the file already
 							// set true flag in file for predefined data
-
-							// maybe tidy this part up to be more like add flash card
 							populateInitData('./basicPrototype.js', './BasicFlashcard.js');
 							populateInitData('./clozePrototype.js', './ClozeFlashcard.js');
 							// check if user wants to continue
@@ -357,16 +312,15 @@ function handleAnswers(answers){
 						case "view-flashcards":
 							switch (answers.viewBasicOrCloze) {
 			  					case "basic":
-			  						displayData(answers.QAorBoth, './BasicFlashcard.js');
+			  						displayData(answers.viewBasicOrCloze, './BasicFlashcard.js');
 			  					break;
 			  					case "cloze":
-			  						displayData(answers.QAorBoth, './ClozeFlashcard.js');
+			  						displayData(answers.viewBasicOrCloze, './ClozeFlashcard.js');
 			  					break;
 			  				}
 							break;	
 						default:
 							console.log("default");
-
 				}
 			break;
 			default:
@@ -393,14 +347,9 @@ function continueGame(){
 			console.log("Goodbye for now!");
 		}
 	}).catch(function(){
-		// 
-		console.log("error in here");
-		// errorHandler(e);
+		console.log("error in here");	
 	})
 }
 
-//Populate seed data initially
-// update questionsArr with seed data
-
-
+// starts here
 userInputs();
