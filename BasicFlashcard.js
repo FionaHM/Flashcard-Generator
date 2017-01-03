@@ -1,14 +1,12 @@
 const fs = require('fs');
-var globalvar = [];
 
-// create 5 instances initially
 var BasicFlashCard = function(filename, front, back){
 	this.filename = filename;
 	this.front = front;
 	this.back = back;
 	this.answer = [];
 
-	// 
+	// gets data from text file and puts it into array for use in the main.js
 	// did not use "this" in the fuction paramaters so that the function can be used outside the constructor objecct
 	this.createFlashcard = function(front, back, filename){
 
@@ -21,6 +19,7 @@ var BasicFlashCard = function(filename, front, back){
 		})
 	}
 
+	// function to read files
 	function handleFileReads(filename){
 			var fs = require("fs");
 			
@@ -34,7 +33,7 @@ var BasicFlashCard = function(filename, front, back){
 			})
 		}
 
-	// pulls data from text file and puts it into array 
+	// pulls data from text file and puts it into array for use in main.js
 	this.getFCData = function(filename){
 		return new Promise(function(resolve, reject){
 			// prints Questions
@@ -50,7 +49,14 @@ var BasicFlashCard = function(filename, front, back){
 				})
 			})	
 		}
-	}
+
+
+	// this.returnAnswer = function(back){
+	// 	// returns just the cloze
+	// 	console.log("in here");
+	// 	return 'ANSWER: '+ back;
+	// }
+}
 
 
 module.exports = BasicFlashCard;
