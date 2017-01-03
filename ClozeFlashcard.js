@@ -37,10 +37,10 @@ var ClozeFlashCard = function(filename, front, back){
 	this.hideClozeData = function(front, back){
 		// find the close data and replace it
 		// verify that the close exists in the statement
-		var lowerQuestion = front.toLowerCase();
-		var lowerAnswer = back.toLowerCase();
+		var lowerQuestion = front.toLowerCase().trim();
+		var lowerAnswer = back.toLowerCase().trim();
 		if (lowerQuestion.indexOf(lowerAnswer) !== -1){
-			var res = front.replace(back, " ... ");
+			var res = lowerQuestion.replace(lowerAnswer, " ... ");
 			return res;
 		} else {
 			try {

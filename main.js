@@ -12,7 +12,7 @@ function userInputs(){
 	    {
 		    type: 'list',
 		    name: 'whichGame',
-		    message: 'Please select an option:',
+		    message: 'Which quiz would you like to take:',
 		    choices: ['basic',
 			  'cloze'], 
 			when: function(answers){
@@ -88,7 +88,7 @@ function userInputs(){
 		},
 		{
 	    	type: "input",
-	    	message: "Please enter an answer to the previous question",
+	    	message: "Please enter an answer to the previous question:",
 	    	name: "answer",
 			when: function(answers){
 	    		if (answers.addBasicOrCloze === "basic"){
@@ -103,7 +103,7 @@ function userInputs(){
 
 		{
 	    	type: "input",
-	    	message: "Please enter the full text for the Cloze Flashcard:",
+	    	message: "Please enter the full text for the cloze-deleted Flashcard:",
 	    	name: "question",
 			when: function(answers){
 	    		if (answers.addBasicOrCloze === "cloze"){
@@ -117,7 +117,7 @@ function userInputs(){
 		},
 		{
 	    	type: "input",
-	    	message: "Please the Cloze part of the previous text:",
+	    	message: "Please indicate the cloze part of the previous statement:",
 	    	name: "answer",
 			when: function(answers){
 	    		if (answers.addBasicOrCloze === "cloze"){
