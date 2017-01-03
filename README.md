@@ -19,12 +19,11 @@ Answer: “Paris”.
 Enter the following in the command line:
 > node main.js
 
-
 * Usage
 
 This Flashcard generator has two modes of operation: 
-    * admin 
-    * user
+    - admin 
+    - user
 
 In the admin mode the user is prompted to select an admin operation as follows:
 
@@ -114,7 +113,9 @@ there were  ...  wise men in bethlehem?
 Selecting an option yields the corresponding answer for that question:
 
 ? Which flashcard do you want to view the answer for?  ...  is the date of christmas day?
+
 Answer: 25th December
+
 ? Do you want to continue? (Y/n) (Y/n) 
 
 In all cases the user will be presented with an option as to whether they would like to continue with the application. Selecting "Y" or hitting enter (default: Y) 
