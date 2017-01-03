@@ -14,13 +14,13 @@ Format is closed deleted statement (front) and answer (back)
 e.g. Statment: “.... is the capital of France”.
 Answer: “Paris”.
 
-** Run
+* Run
 
 Enter the following in the command line:
 > node main.js
 
 
-** Usage
+* Usage
 
 This Flashcard generator has two modes of operation: 
     * admin 
@@ -182,7 +182,7 @@ Incorrect the answer is: rain
 
 
 
-**  Integration with other libraries
+*  Integration with other libraries
 
 The following libraries were used and those that are not native to node should be included in package.json.
 
@@ -204,7 +204,7 @@ var fs = require('fs');
 Used to for all file operations - read, write, delete, exists etc. 
 
 
-**  Files
+*  Files
 
 The folder structure is flat - all files are in same parent folder.
 
@@ -228,6 +228,6 @@ node_modules            -	 folder that contains relevant node modules
 package.json            - 	created when command ‘npm init’ is run.  Can be modified manually to include dependencies data or automatically when ‘npm install <library> --save’ is run e.g. ‘npm install inquirer --save’
 README.md 		- 	this file containing relevant operational information.
 
-**  License
+*  License
 Flashcard-Generator is released under the MIT license.
 
